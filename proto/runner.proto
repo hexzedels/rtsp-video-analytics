@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "internal/proto/pb";
+
+enum State {
+  STATE_UNDEFINED = 0;
+  STATE_INIT = 1;
+  STATE_STARTUP = 2;
+  STATE_ACTIVE = 3;
+  STATE_SHUTDOWN = 4;
+  STATE_SHUTDOWN_PROCESSING = 5;
+  STATE_INACTIVE = 6;
+}
+
+enum QueryType {
+    TYPE_UNDEFINED = 0;
+    TYPE_RUN_JOB = 1;
+}
+
+
+service Runner {
+    rpc Run(Query) returns (QueryResp) {}
+    rpc Get(Job) returns (JobResult) {}
+}
+
+message Query {
+    int64 id = 1;
+    string source = 2; 
+}
+
+message QueryResp {
+    State state = 1;
+}
+
+message Job {
+    int64 id = 1;
+}
+
+message JobResult {
+    State state = 1;
+    int64 frame = 2;
+}
