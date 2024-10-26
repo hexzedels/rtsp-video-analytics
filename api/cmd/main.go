@@ -2,15 +2,16 @@ package main
 
 import (
 	"os"
-	"streaming/api/internal/db"
-	"streaming/api/internal/server"
+
+	"streaming/api/internal/config"
+	"streaming/api/internal/controller/server"
 )
 
 func main() {
-	hostPort := os.Getenv(server.EnvHostPort)
-	sqlitePath := os.Getenv(db.EnvSQLite)
-	sqliteClient := db.NewSQLiteClient(sqlitePath)
-	srvr := server.NewServer(hostPort, sqliteClient)
+	hostPort := os.Getenv(config.EnvHostPort)
+	orchestratorURL := os.Getenv(config.EnvOrchestratorURL)
+
+	srvr := server.NewServer(hostPort).SetOrchestratorClient(orchestratorURL)
 
 	srvr.Start()
 }

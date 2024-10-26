@@ -2,8 +2,9 @@ package main
 
 import (
 	"os"
+
+	"streaming/orchestrator/internal/controller/server"
 	"streaming/orchestrator/internal/db"
-	"streaming/orchestrator/internal/server"
 )
 
 func main() {

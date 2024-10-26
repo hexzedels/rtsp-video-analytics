@@ -1,6 +1,8 @@
 package client
 
-import "streaming/api/internal/proto/pb"
+import (
+	"streaming/runner/internal/proto/pb"
+)
 
 type Client interface {
 	pb.RunnerClient
