@@ -2,16 +2,27 @@ package main
 
 import (
 	"os"
+	"strconv"
 
 	"streaming/orchestrator/internal/controller/server"
 	"streaming/orchestrator/internal/db"
+	"streaming/orchestrator/internal/orchestrator"
 )
 
 func main() {
-	hostPort := os.Getenv(server.EnvHostPort)
+	host := os.Getenv(server.EnvHost)
+	portRaw := os.Getenv(server.EnvPort)
+	if portRaw == "" {
+		panic("empty port")
+	}
+
+	port, err := strconv.Atoi(portRaw)
+	if err != nil {
+		panic(err)
+	}
+
 	sqlitePath := os.Getenv(db.EnvSQLite)
 	sqliteClient := db.NewSQLiteClient(sqlitePath)
-	srvr := server.NewServer(hostPort, sqliteClient)
-
-	srvr.Start()
+	orchestratorService := orchestrator.New()
+	server.New(host, port, sqliteClient, orchestratorService).Start()
 }

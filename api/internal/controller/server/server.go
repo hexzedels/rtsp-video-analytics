@@ -38,10 +38,10 @@ func (r *Server) Start() {
 func (r *Server) newAPI() *gin.Engine {
 	eng := gin.New()
 
-	apiV1 := eng.Group("/api/v1")
+	apiV1 := eng.Group("/v1")
 
 	privateRouter := NewPrivate(r.orchClient)
-	job.AttachToGroup(apiV1.Group("/job"), privateRouter)
+	job.AttachToGroup(apiV1.Group("/jobs"), privateRouter)
 
 	return eng
 }

@@ -1,5 +1,6 @@
 package server
 
 const (
-	EnvHostPort = "API_HOST_PORT"
+	EnvHost = "ENV_HOST"
+	EnvPort = "ENV_PORT"
 )

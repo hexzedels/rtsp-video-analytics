@@ -3,11 +3,11 @@ package client
 import (
 	"google.golang.org/grpc"
 
-	"streaming/orchestrator/internal/proto/pb"
+	"streaming/orchestrator/internal/streaming/pb"
 )
 
 type OrchestratorClient interface {
-	pb.RunnerClient
+	pb.OrchestratorClient
 }
 
 func NewOrchestrator(oURL string) (OrchestratorClient, error) {
@@ -16,5 +16,5 @@ func NewOrchestrator(oURL string) (OrchestratorClient, error) {
 		return nil, err
 	}
 
-	return pb.NewRunnerClient(conn), nil
+	return pb.NewOrchestratorClient(conn), nil
 }

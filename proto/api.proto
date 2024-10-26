@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package streaming;
+
+import "job.proto";
+
+option go_package = "internal/streaming/pb";
+
+service Orchestrator {
+    rpc Run(RunQuery) returns (RunResp) {}
+    rpc Get(Job) returns (JobResult) {}
+    rpc Cancel(CancelQuery) returns (CancelResp) {}
+}
+
+message RunQuery {
+    string id = 1;
+    Source source = 2;
+}
+
+message RunResp {
+    State state = 1;
+}
+
+message CancelQuery {
+    string id = 1;
+}
+
+message CancelResp {
+    string id = 1;
+    bool outcome = 2;
+}

@@ -1,0 +1,8 @@
+{
+  "version": "1",
+  "name": "streaming",
+  "type": "collection",
+  "ignore": [
+    ".git"
+  ]
+}
