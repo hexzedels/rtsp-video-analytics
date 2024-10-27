@@ -21,13 +21,14 @@ enum SourceType {
 }
 
 message Source {
-    string id = 1;
-    string url = 2;
-    SourceType source_type = 3;
+    string url = 1;
+    SourceType source_type = 2;
 }
 
 message Job {
     string id = 1;
+    State state = 2;
+    Source source = 3;
 }
 
 message Result {
@@ -37,7 +38,5 @@ message Result {
 
 message JobResult {
     string id = 1;
-    State state = 2;
-    Source source = 3;
     repeated Result results = 4;
 }

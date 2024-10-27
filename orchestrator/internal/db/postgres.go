@@ -7,7 +7,7 @@ import (
 )
 
 type PostgresClient struct {
-	*baseClient
+	db *sql.DB
 }
 
 func NewPostgresClient(uri string) *PostgresClient {
@@ -17,6 +17,6 @@ func NewPostgresClient(uri string) *PostgresClient {
 	}
 
 	return &PostgresClient{
-		newBaseClient(db),
+		db: db,
 	}
 }

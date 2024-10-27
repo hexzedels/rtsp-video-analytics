@@ -29,7 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrchestratorClient interface {
 	Run(ctx context.Context, in *RunQuery, opts ...grpc.CallOption) (*RunResp, error)
-	Get(ctx context.Context, in *Job, opts ...grpc.CallOption) (*JobResult, error)
+	Get(ctx context.Context, in *GetQuery, opts ...grpc.CallOption) (*GetResp, error)
 	Cancel(ctx context.Context, in *CancelQuery, opts ...grpc.CallOption) (*CancelResp, error)
 }
 
@@ -50,8 +50,8 @@ func (c *orchestratorClient) Run(ctx context.Context, in *RunQuery, opts ...grpc
 	return out, nil
 }
 
-func (c *orchestratorClient) Get(ctx context.Context, in *Job, opts ...grpc.CallOption) (*JobResult, error) {
-	out := new(JobResult)
+func (c *orchestratorClient) Get(ctx context.Context, in *GetQuery, opts ...grpc.CallOption) (*GetResp, error) {
+	out := new(GetResp)
 	err := c.cc.Invoke(ctx, Orchestrator_Get_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func (c *orchestratorClient) Cancel(ctx context.Context, in *CancelQuery, opts .
 // for forward compatibility
 type OrchestratorServer interface {
 	Run(context.Context, *RunQuery) (*RunResp, error)
-	Get(context.Context, *Job) (*JobResult, error)
+	Get(context.Context, *GetQuery) (*GetResp, error)
 	Cancel(context.Context, *CancelQuery) (*CancelResp, error)
 	mustEmbedUnimplementedOrchestratorServer()
 }
@@ -85,7 +85,7 @@ type UnimplementedOrchestratorServer struct {
 func (UnimplementedOrchestratorServer) Run(context.Context, *RunQuery) (*RunResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Run not implemented")
 }
-func (UnimplementedOrchestratorServer) Get(context.Context, *Job) (*JobResult, error) {
+func (UnimplementedOrchestratorServer) Get(context.Context, *GetQuery) (*GetResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
 func (UnimplementedOrchestratorServer) Cancel(context.Context, *CancelQuery) (*CancelResp, error) {
@@ -123,7 +123,7 @@ func _Orchestrator_Run_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _Orchestrator_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Job)
+	in := new(GetQuery)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func _Orchestrator_Get_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: Orchestrator_Get_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrchestratorServer).Get(ctx, req.(*Job))
+		return srv.(OrchestratorServer).Get(ctx, req.(*GetQuery))
 	}
 	return interceptor(ctx, in, info, handler)
 }
