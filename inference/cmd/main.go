@@ -9,12 +9,13 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"streaming/runner/config"
-	"streaming/runner/internal/runner"
+	"streaming/inference/config"
+	"streaming/inference/internal/inference"
 )
 
 func main() {
 	natsURL := os.Getenv(config.EnvNatsURL)
+	modelPath := os.Getenv(config.EnvModelPath)
 
 	logger, err := zap.NewProduction(zap.AddStacktrace(zapcore.ErrorLevel), zap.AddCaller())
 	if err != nil {
@@ -35,12 +36,11 @@ func main() {
 
 	workersCount := os.Getenv(config.EnvWorkersCount)
 	if workersCount != "" {
-		i64, err := strconv.ParseInt(workersCount, 10, 0)
+		workers, err = strconv.Atoi(workersCount)
 		if err != nil {
 			panic(err)
 		}
-		workers = i64
 	}
 
-	runner.New(js, logger, workers).Start()
+	inference.New(logger, js, modelPath, workers).Start()
 }

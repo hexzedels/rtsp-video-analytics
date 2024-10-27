@@ -27,6 +27,10 @@ func main() {
 	}
 
 	logger, err := zap.NewProduction(zap.AddStacktrace(zapcore.ErrorLevel), zap.AddCaller())
+	if err != nil {
+		panic(err)
+	}
+
 	sqlitePath := os.Getenv(db.EnvSQLite)
 	sqliteClient := db.MustNewSQLiteClient(sqlitePath, logger)
 
