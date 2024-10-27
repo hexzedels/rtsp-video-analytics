@@ -31,11 +31,19 @@ func main() {
 		panic(err)
 	}
 
-	sqlitePath := os.Getenv(db.EnvSQLite)
+	sqlitePath := os.Getenv(server.EnvSQLite)
 	sqliteClient := db.MustNewSQLiteClient(sqlitePath, logger)
 
-	nc, err := nats.Connect("")
+	natsURL := os.Getenv(server.EnvNatsURL)
+	nc, err := nats.Connect(natsURL)
+	if err != nil {
+		panic(err)
+	}
+
 	js, err := jetstream.New(nc)
+	if err != nil {
+		panic(err)
+	}
 
 	orchestratorService := orchestrator.New(sqliteClient, js, logger)
 
