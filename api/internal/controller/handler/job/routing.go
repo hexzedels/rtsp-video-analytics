@@ -4,16 +4,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"streaming/orchestrator/pkg/client"
+	"streaming/api/internal/pkg/orchestrator"
 )
 
 type jobPrivateRouter struct {
-	orchestratorClient client.OrchestratorClient
+	orchestratorClient orchestrator.Client
 	logger             *zap.Logger
 }
 
 type clientProvider interface {
-	OrchestratorClient() client.OrchestratorClient
+	OrchestratorClient() orchestrator.Client
 	Logger() *zap.Logger
 }
 

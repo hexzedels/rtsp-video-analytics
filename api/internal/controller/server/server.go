@@ -2,24 +2,27 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	"streaming/api/internal/controller/handler/job"
-	"streaming/orchestrator/pkg/client"
+	"streaming/api/internal/pkg/orchestrator"
 )
 
 type Server struct {
 	hostPort   string
-	orchClient client.OrchestratorClient
+	orchClient orchestrator.Client
+	logger     *zap.Logger
 }
 
-func NewServer(hostPort string) *Server {
+func NewServer(logger *zap.Logger, hostPort string) *Server {
 	return &Server{
 		hostPort: hostPort,
+		logger:   logger.Named("api"),
 	}
 }
 
 func (r *Server) SetOrchestratorClient(oURL string) *Server {
-	orchClient, err := client.NewOrchestrator(oURL)
+	orchClient, err := orchestrator.New(oURL)
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +43,7 @@ func (r *Server) newAPI() *gin.Engine {
 
 	apiV1 := eng.Group("/v1")
 
-	privateRouter := NewPrivate(r.orchClient)
+	privateRouter := NewPrivate(r.orchClient, r.logger)
 	job.AttachToGroup(apiV1.Group("/jobs"), privateRouter)
 
 	return eng

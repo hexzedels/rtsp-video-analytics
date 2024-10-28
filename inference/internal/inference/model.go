@@ -26,12 +26,13 @@ type Inference struct {
 	wg             *sync.WaitGroup
 	logger         *zap.Logger
 	js             jetstream.JetStream
+	streamName     string
 	predictSubject string
 
 	workersCount int
 }
 
-func New(logger *zap.Logger, js jetstream.JetStream, modelPath string, workers int) *Inference {
+func New(logger *zap.Logger, js jetstream.JetStream, modelPath string, workers int, streamName string) *Inference {
 	net := gocv.ReadNetFromONNX(modelPath)
 	net.SetPreferableBackend(gocv.NetBackendOpenCV)
 	net.SetPreferableTarget(gocv.NetTargetCPU)
@@ -58,13 +59,15 @@ func New(logger *zap.Logger, js jetstream.JetStream, modelPath string, workers i
 	)
 
 	return &Inference{
-		net:          &net,
-		params:       params,
-		outputNames:  outputNames,
-		js:           js,
-		wg:           new(sync.WaitGroup),
-		logger:       logger.Named("inference"),
-		workersCount: workers,
+		net:            &net,
+		params:         params,
+		outputNames:    outputNames,
+		js:             js,
+		wg:             new(sync.WaitGroup),
+		logger:         logger.Named("inference"),
+		workersCount:   workers,
+		streamName:     streamName,
+		predictSubject: "predict",
 	}
 }
 
@@ -78,7 +81,9 @@ func (r *Inference) Start() {
 		go r.worker(ch)
 	}
 
-	consumer, err := r.js.CreateConsumer(ctx, "string", jetstream.ConsumerConfig{})
+	consumer, err := r.js.CreateConsumer(ctx, r.streamName, jetstream.ConsumerConfig{
+		FilterSubject: "frame",
+	})
 	if err != nil {
 		r.logger.Error("create frame consumer", zap.Error(err))
 		return

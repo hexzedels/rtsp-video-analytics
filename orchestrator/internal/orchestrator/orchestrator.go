@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/nats-io/nats.go/jetstream"
@@ -24,7 +25,26 @@ type Service struct {
 	js       jetstream.JetStream
 	logger   *zap.Logger
 
+	streamName string
+
 	pb.UnimplementedOrchestratorServer
+}
+
+func (r *Service) Start() {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+
+	stream, err := r.js.CreateStream(ctx, jetstream.StreamConfig{
+		Name:     r.streamName,
+		Subjects: []string{"job", "frame", "predict"},
+	})
+	if err != nil {
+		r.logger.Error("create jobs stream", zap.Error(err))
+	}
+
+	info, _ := stream.Info(ctx)
+	cancel()
+
+	r.logger.Info("stream info", zap.String("name", r.streamName), zap.Any("info", info))
 }
 
 func (r *Service) Run(ctx context.Context, in *pb.RunQuery) (*pb.RunResp, error) {
@@ -43,7 +63,7 @@ func (r *Service) Run(ctx context.Context, in *pb.RunQuery) (*pb.RunResp, error)
 		return nil, fmt.Errorf("marshal job: %w", err)
 	}
 
-	ack, err := r.js.Publish(ctx, "jobs", b)
+	ack, err := r.js.Publish(ctx, "job", b)
 	if err != nil {
 		return nil, fmt.Errorf("publish job: %w", err)
 	}
@@ -105,10 +125,11 @@ func (r *Service) Cancel(ctx context.Context, in *pb.CancelQuery) (*pb.CancelRes
 	}, nil
 }
 
-func New(dbClient db.Client, js jetstream.JetStream, logger *zap.Logger) *Service {
+func New(dbClient db.Client, js jetstream.JetStream, logger *zap.Logger, streamName string) *Service {
 	return &Service{
-		dbClient: dbClient,
-		js:       js,
-		logger:   logger.Named("orchestrator"),
+		dbClient:   dbClient,
+		js:         js,
+		logger:     logger.Named("orchestrator"),
+		streamName: streamName,
 	}
 }

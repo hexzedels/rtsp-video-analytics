@@ -15,6 +15,7 @@ import (
 
 func main() {
 	natsURL := os.Getenv(config.EnvNatsURL)
+	streamName := os.Getenv(config.EnvNatsStream)
 
 	logger, err := zap.NewProduction(zap.AddStacktrace(zapcore.ErrorLevel), zap.AddCaller())
 	if err != nil {
@@ -42,5 +43,5 @@ func main() {
 		workers = i64
 	}
 
-	runner.New(js, logger, workers).Start()
+	runner.New(js, logger, workers, streamName).Start()
 }

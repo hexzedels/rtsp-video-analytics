@@ -20,7 +20,7 @@ import (
 
 type Runner struct {
 	js            jetstream.JetStream
-	jobStream     string
+	streamName    string
 	frameSubject  string
 	logger        *zap.Logger
 	framerFactory map[pb.SourceType]func() framer.Framer
@@ -53,7 +53,9 @@ func (r *Runner) Start() {
 func (r *Runner) start(ctx context.Context) {
 	defer r.wg.Done()
 
-	jobConsumer, err := r.js.CreateConsumer(ctx, r.jobStream, jetstream.ConsumerConfig{})
+	jobConsumer, err := r.js.CreateConsumer(ctx, r.streamName, jetstream.ConsumerConfig{
+		FilterSubject: "job",
+	})
 	if err != nil {
 		return
 	}
@@ -109,7 +111,16 @@ func (r *Runner) startFramer(ctx context.Context, job *pb.Job) {
 			break
 		}
 
-		r.js.Publish(context.TODO(), r.frameSubject, frame.Payload)
+		b, err := proto.Marshal(frame)
+		if err != nil {
+			break
+		}
+
+		_, err = r.js.PublishAsync(r.frameSubject, b)
+		if err != nil {
+			r.logger.Error("publish frame async", zap.Error(err))
+			continue
+		}
 
 		select {
 		case <-ctx.Done():
@@ -119,12 +130,14 @@ func (r *Runner) startFramer(ctx context.Context, job *pb.Job) {
 	}
 }
 
-func New(js jetstream.JetStream, logger *zap.Logger, workers int64) *Runner {
+func New(js jetstream.JetStream, logger *zap.Logger, workers int64, streamName string) *Runner {
 	return &Runner{
 		js:            js,
 		logger:        logger.Named("runner"),
 		wg:            new(sync.WaitGroup),
 		framerFactory: framer.Factory,
 		sema:          semaphore.NewWeighted(workers),
+		streamName:    streamName,
+		frameSubject:  "frame",
 	}
 }

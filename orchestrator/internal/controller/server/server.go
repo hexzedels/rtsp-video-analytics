@@ -16,18 +16,20 @@ import (
 )
 
 type Server struct {
-	host       string
-	port       int
-	dbClient   db.Client
-	grpcServer *grpc.Server
-	logger     *zap.Logger
+	host         string
+	port         int
+	dbClient     db.Client
+	grpcServer   *grpc.Server
+	orchestrator *orchestrator.Service
+	logger       *zap.Logger
 }
 
 func New(host string, port int, dbClient db.Client, orchestrator *orchestrator.Service) *Server {
 	s := &Server{
-		host:     host,
-		port:     port,
-		dbClient: dbClient,
+		host:         host,
+		port:         port,
+		dbClient:     dbClient,
+		orchestrator: orchestrator,
 	}
 
 	s.grpcServer = grpc.NewServer()
@@ -38,6 +40,8 @@ func New(host string, port int, dbClient db.Client, orchestrator *orchestrator.S
 }
 
 func (r *Server) Start() {
+	r.orchestrator.Start()
+
 	go r.startGrpc(r.port)
 
 	c := make(chan os.Signal, 1)

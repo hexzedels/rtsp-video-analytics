@@ -1,8 +1,9 @@
 package config
 
 const (
-	EnvNatsURL      = "ENV_NATS_URL"
-	EnvWorkersCount = "ENV_WORKERS_COUNT"
+	EnvNatsURL      = "NATS_URL"
+	EnvNatsStream   = "NATS_STREAM"
+	EnvWorkersCount = "WORKERS_COUNT"
 )
 
 const (

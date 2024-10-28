@@ -5,7 +5,16 @@ meta {
 }
 
 post {
-  url: http://localhost:8090/v1/jobs/
-  body: none
+  url: http://localhost:8099/v1/jobs
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "source":{
+      "url":"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+      "source_type":2
+    }
+  }
 }

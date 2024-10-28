@@ -1,9 +1,10 @@
 package server
 
 const (
-	EnvHost     = "HOST"
-	EnvPort     = "PORT"
-	EnvNatsURL  = "NATS_URL"
-	EnvPostgres = "POSTGRES"
-	EnvSQLite   = "SQLITE"
+	EnvHost       = "HOST"
+	EnvPort       = "PORT"
+	EnvNatsURL    = "NATS_URL"
+	EnvPostgres   = "POSTGRES"
+	EnvSQLite     = "SQLITE"
+	EnvNatsStream = "NATS_STREAM"
 )

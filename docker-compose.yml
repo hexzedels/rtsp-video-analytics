@@ -1,10 +1,36 @@
 services:
-  nats:
+  nats1:
+    container_name: nats1
     image: nats:alpine
     ports:
-      - "8222:8222"
       - "4222:4222"
-    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --http_port 8222 "
+    command: "--name nats1 --cluster_name NATS --jetstream --config /etc/nats/nats-server.conf --sd /data --cluster nats://0.0.0.0:6222 --routes nats://nats1:6222,nats://nats2:6222,nats://nats3:6222 --http_port 8222 -p 4222"
     networks: ["streaming"]
+    volumes:
+    - ./conf/nats-server.conf:/etc/nats/nats-server.conf
+    - ./jetstream-cluster/nats1:/data
+  nats2:
+    container_name: nats2
+    image: nats:alpine
+    command: "--name nats2 --cluster_name NATS --jetstream --config /etc/nats/nats-server.conf --sd /data --cluster nats://0.0.0.0:6222 --routes nats://nats1:6222,nats://nats2:6222,nats://nats3:6222 --http_port 8222 -p 4222"
+    networks: ["streaming"]
+    volumes:
+    - ./conf/nats-server.conf:/etc/nats/nats-server.conf
+    - ./jetstream-cluster/nats2:/data
+  nats3:
+    container_name: nats3
+    image: nats:alpine
+    # ports:
+    #   - "8222:8222"
+    #   - "4222:4222"
+    command: "--name nats3 --cluster_name NATS --jetstream --config /etc/nats/nats-server.conf --sd /data --cluster nats://0.0.0.0:6222 --routes nats://nats1:6222,nats://nats2:6222,nats://nats3:6222 --http_port 8222 -p 4222"
+    networks: ["streaming"]
+    volumes:
+    - ./conf/nats-server.conf:/etc/nats/nats-server.conf
+    - ./jetstream-cluster/nats3:/data
+volumes:
+  nats1:
+  nats2:
+  nats3:
 networks:
   streaming:

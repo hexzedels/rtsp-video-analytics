@@ -15,6 +15,7 @@ import (
 )
 
 func main() {
+	streamName := os.Getenv(server.EnvNatsStream)
 	host := os.Getenv(server.EnvHost)
 	portRaw := os.Getenv(server.EnvPort)
 	if portRaw == "" {
@@ -45,7 +46,7 @@ func main() {
 		panic(err)
 	}
 
-	orchestratorService := orchestrator.New(sqliteClient, js, logger)
+	orchestratorService := orchestrator.New(sqliteClient, js, logger, streamName)
 
 	server.New(host, port, sqliteClient, orchestratorService).Start()
 }

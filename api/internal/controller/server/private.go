@@ -3,15 +3,15 @@ package server
 import (
 	"go.uber.org/zap"
 
-	"streaming/orchestrator/pkg/client"
+	"streaming/api/internal/pkg/orchestrator"
 )
 
 type Private struct {
-	orchestratorClient client.OrchestratorClient
+	orchestratorClient orchestrator.Client
 	logger             *zap.Logger
 }
 
-func (r *Private) OrchestratorClient() client.OrchestratorClient {
+func (r *Private) OrchestratorClient() orchestrator.Client {
 	return r.orchestratorClient
 }
 
@@ -19,6 +19,9 @@ func (r *Private) Logger() *zap.Logger {
 	return r.logger
 }
 
-func NewPrivate(oClient client.OrchestratorClient) *Private {
-	return &Private{orchestratorClient: oClient}
+func NewPrivate(oClient orchestrator.Client, logger *zap.Logger) *Private {
+	return &Private{
+		orchestratorClient: oClient,
+		logger:             logger,
+	}
 }

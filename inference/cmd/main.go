@@ -15,6 +15,7 @@ import (
 
 func main() {
 	natsURL := os.Getenv(config.EnvNatsURL)
+	streamName := os.Getenv(config.EnvNatsStream)
 	modelPath := os.Getenv(config.EnvModelPath)
 
 	logger, err := zap.NewProduction(zap.AddStacktrace(zapcore.ErrorLevel), zap.AddCaller())
@@ -42,5 +43,5 @@ func main() {
 		}
 	}
 
-	inference.New(logger, js, modelPath, workers).Start()
+	inference.New(logger, js, modelPath, workers, streamName).Start()
 }
