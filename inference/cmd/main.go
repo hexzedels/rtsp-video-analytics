@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"runtime/debug"
 	"strconv"
 
 	"github.com/nats-io/nats.go"
@@ -14,6 +15,8 @@ import (
 )
 
 func main() {
+	debug.SetGCPercent(10)
+
 	natsURL := os.Getenv(config.EnvNatsURL)
 	streamName := os.Getenv(config.EnvNatsStream)
 	modelPath := os.Getenv(config.EnvModelPath)

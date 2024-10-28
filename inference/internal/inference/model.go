@@ -94,6 +94,7 @@ func (r *Inference) Start() {
 		r.logger.Error("subscribe to messages", zap.Error(err))
 		return
 	}
+	defer frames.Stop()
 
 	for {
 		msg, err := frames.Next()
@@ -101,6 +102,8 @@ func (r *Inference) Start() {
 			r.logger.Error("get next frame", zap.Error(err))
 			break
 		}
+
+		msg.Ack()
 
 		var frame pb.Frame
 
@@ -142,6 +145,11 @@ func (r *Inference) worker(ch chan *pb.Frame) {
 
 		predicts := r.detect(&newImg)
 
+		// We send only frames with prediction
+		if len(predicts) == 0 {
+			continue
+		}
+
 		framePred := &pb.FramePrediction{
 			Frame:    frame,
 			Predicts: predicts,
@@ -154,6 +162,9 @@ func (r *Inference) worker(ch chan *pb.Frame) {
 		}
 
 		r.js.Publish(ctx, r.predictSubject, b)
+
+		_ = b
+
 		newImg.Close()
 	}
 }
